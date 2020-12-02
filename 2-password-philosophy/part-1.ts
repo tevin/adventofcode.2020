@@ -11,11 +11,9 @@ const rl = createInterface({
 
 rl.on('line', async (line: string) => {
   await new Promise((_resolve, _reject) => {
-    const [_, minOccurencesStr, maxOccurencesStr, letter, password] = line.match(MATCH_RULES) || []
-    const minOccurences = +minOccurencesStr
-    const maxOccurences = +maxOccurencesStr
+    const [_, minOccurences, maxOccurences, letter, password] = line.match(MATCH_RULES) || []
     const occurences = (password.match(new RegExp(letter, 'g'))||[]).length
-    if(minOccurences <=  occurences && maxOccurences >=occurences) count++ 
+    if(+minOccurences <=  occurences && +maxOccurences >=occurences) count++ 
   })
 });
 
