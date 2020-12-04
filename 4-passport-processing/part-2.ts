@@ -29,10 +29,11 @@ const passports = readFileSync(`${__dirname}/input.txt`).toString('utf-8').split
 const validPassports = passports.reduce((acc: number, passport: string) => {
   const flatPassport = passport.split(/\s|:/)
   if (!(mandatoryFieldsStr.every((mandatoryField) => flatPassport.includes(mandatoryField)))) return acc
-  return acc + +!!(passport.split(/\s|:/)
-    .map((val, idx, arr) => (idx % 2 === 0) ? [val, arr[idx+1]] : false)
-    .filter(Boolean)
-    .reduce((validSoFar, current) => { return validSoFar && current && mandatoryFields[current[0] as keyof typeof mandatoryFields](current[1])}, true))
+  return acc + +!!(
+    flatPassport
+      .map((val, idx, arr) => (idx % 2 === 0) ? [val, arr[idx+1]] : false)
+      .filter(Boolean)
+      .reduce((validSoFar, current) => { return validSoFar && current && mandatoryFields[current[0] as keyof typeof mandatoryFields](current[1])}, true))
   }, 0)
 
 console.log(validPassports)
