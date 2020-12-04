@@ -10,7 +10,7 @@ ecl (Eye Color)
 pid (Passport ID)
 cid (Country ID) -> Not Mandatory
 */
-
+const mandatoryFieldsStr = ['byr', 'iyr', 'eyr', 'hgt', 'hcl', 'ecl', 'pid']
 const mandatoryFields = {
   byr: (byr: string) => (+byr >= 1920 && +byr <= 2002),
   hgt: (hgt: string) => {
@@ -19,16 +19,20 @@ const mandatoryFields = {
   },
   hcl: (hcl: string) => (hcl.match(/#([a-f]|[0-9]){6}/) || []).length > 0,
   ecl: (ecl: string) => ['amb','blu','brn','gry','grn','hzl','oth'].includes(ecl),
-  pid: (pid: string) => (pid.match(/^\d{9}$/gm) || []).length > 0
+  pid: (pid: string) => (pid.match(/^\d{9}$/gm) || []).length > 0,
+  iyr: (iyr: string) => (+iyr >= 2010 && +iyr <= 2020),
+  eyr: (eyr: string) => (+eyr >= 2020 && +eyr <= 2030),
+  cid: (cid: string) => true
 }
 
 const passports = readFileSync(`${__dirname}/input.txt`).toString('utf-8').split(`\n\n`)
 const validPassports = passports.reduce((acc: number, passport: string) => {
+  const flatPassport = passport.split(/\s|:/)
+  if (!(mandatoryFieldsStr.every((mandatoryField) => flatPassport.includes(mandatoryField)))) return acc
   return acc + +!!(passport.split(/\s|:/)
-    .map((val, idx, arr) => (idx % 2 === 0) ? [val as keyof typeof  mandatoryFields, arr[idx+1]] : false)
+    .map((val, idx, arr) => (idx % 2 === 0) ? [val, arr[idx+1]] : false)
     .filter(Boolean)
-    .reduce((acc, current) => { return acc && current && mandatoryFields[current[0]](current[1])}, true)
-    )}, 
-  0)
+    .reduce((validSoFar, current) => { return validSoFar && current && mandatoryFields[current[0] as keyof typeof mandatoryFields](current[1])}, true))
+  }, 0)
 
 console.log(validPassports)
